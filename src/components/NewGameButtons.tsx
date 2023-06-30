@@ -1,12 +1,7 @@
 import Link from "next/link";
-import React, { useContext } from "react";
-import { Mark, PlayersContext } from "@/context/playersContext";
-import { GameState, GameStateContext } from "@/context/gameState.context";
+import React from "react";
 
 export default function NewGameButtons() {
-  const { players, setPlayers } = useContext(PlayersContext);
-  const { setGameState } = useContext(GameStateContext);
-
   return (
     <div className="flex flex-col gap-6">
       <Link

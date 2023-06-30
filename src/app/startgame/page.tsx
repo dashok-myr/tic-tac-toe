@@ -6,8 +6,10 @@ import nought from "@/icons/icon-o.svg";
 import cross from "@/icons/icon-x.svg";
 import restart from "@/icons/icon-restart.svg";
 import Modal from "@/components/Modal";
-import { Mark, PlayersContext } from "@/context/playersContext";
+import { EMark, PlayersContext } from "@/context/playersContext";
 import { GameState, GameStateContext } from "@/context/gameState.context";
+import { GameScoreContext } from "@/context/gameScore.context";
+import useGetModalOptions from "@/app/startgame/useGetModalOptions";
 
 const winningPossibilities = [
   [1, 2, 3],
@@ -54,67 +56,21 @@ function hasTied(slots: number[]) {
   return slots.length === 9 && !hasPlayerWon(slots);
 }
 
-function getModalOptions(state: GameState) {
-  switch (state) {
-    case GameState.WIN:
-      return {
-        gameResult: "YOU WON!",
-        firstBtnLabel: "QUIT",
-        secondBtnLabel: "NEXT ROUND",
-        navigate: "/",
-      };
-    case GameState.FIRST_PLAYER_WIN:
-      return {
-        gameResult: "PLAYER 1 WINS!",
-        firstBtnLabel: "QUIT",
-        secondBtnLabel: "NEXT ROUND",
-        navigate: "/",
-      };
-    case GameState.SECOND_PLAYER_WIN:
-      return {
-        gameResult: "PLAYER 2 WINS!",
-        firstBtnLabel: "QUIT",
-        secondBtnLabel: "NEXT ROUND",
-        navigate: "/",
-      };
-    case GameState.TIED:
-      return {
-        gameResult: "IT'S A TIE!",
-        firstBtnLabel: "QUIT",
-        secondBtnLabel: "NEXT ROUND",
-        navigate: "/",
-      };
-    case GameState.LOST:
-      return {
-        gameResult: "ON NO, YOU LOST...",
-        firstBtnLabel: "QUIT",
-        secondBtnLabel: "NEXT ROUND",
-        navigate: "/",
-      };
-    case GameState.RESTART:
-      return {
-        gameResult: "RESTART THE GAME?",
-        firstBtnLabel: "NO, CANCEL",
-        secondBtnLabel: "YES, RESTART",
-      };
-    default:
-      return null;
+function MarkIcon({ mark }: { mark: EMark }) {
+  if (mark === EMark.CROSS) {
+    return <Image src={cross} alt="cross" width="70" height="70" />;
   }
-}
-
-function MarkIcon({ mark }: { mark: Mark }) {
-  if (mark === Mark.CROSS) {
-    return <Image src={cross} alt="cross" width="80" height="80" />;
-  }
-  return <Image src={nought} alt="nought" width="80" height="80" />;
+  return <Image src={nought} alt="nought" width="70" height="70" />;
 }
 
 export default function StartGame() {
   const { players, setPlayers } = useContext(PlayersContext);
   const { gameState, setGameState } = useContext(GameStateContext);
+  const { gameScore, setGameScore } = useContext(GameScoreContext);
   const [currentPlayer, setCurrentPlayer] = useState<"p1" | "p2">(
-    players.p1.mark === Mark.CROSS ? "p1" : "p2"
+    players.p1.mark === EMark.CROSS ? "p1" : "p2"
   );
+  const modalOptions = useGetModalOptions(gameState, setCurrentPlayer);
 
   const cellDesign = Array.from({ length: 9 }, (_, index) => index + 1);
 
@@ -128,74 +84,46 @@ export default function StartGame() {
           ? GameState.FIRST_PLAYER_WIN
           : GameState.SECOND_PLAYER_WIN
       );
+
+      if (currentPlayer === "p1") {
+        setGameScore({
+          ...gameScore,
+          p1: gameScore.p1 + 1,
+        });
+      }
+      if (currentPlayer === "p2") {
+        setGameScore({
+          ...gameScore,
+          p2: gameScore.p2 + 1,
+        });
+      }
     }
     if (hasTied([...players.p1.slots, ...players.p2.slots])) {
       setGameState(GameState.TIED);
+      setGameScore({
+        ...gameScore,
+        ties: gameScore.ties + 1,
+      });
     }
     setPlayers(copyPlayers);
     setCurrentPlayer(currentPlayer === "p1" ? "p2" : "p1");
   }
 
-  const modalOptions = getModalOptions(gameState);
-
   return (
     <div className="flex flex-col justify-center gap-10 mx-auto w-1/2 md:w-1/4 h-screen">
-      <div className="flex justify-around text-silver">
-        <div>
-          Player 1:
-          {players.p1.mark === Mark.CROSS ? (
-            <div>CROSS</div>
-          ) : (
-            <div>NOUGHT</div>
-          )}
-        </div>
-        <div>
-          Player 2:
-          {players.p2.mark === Mark.CROSS ? (
-            <div>CROSS</div>
-          ) : (
-            <div>NOUGHT</div>
-          )}
-        </div>
-      </div>
       <Modal
         gameResult={modalOptions?.gameResult || ""}
         firstBtnLabel={modalOptions?.firstBtnLabel || ""}
         secondBtnLabel={modalOptions?.secondBtnLabel || ""}
         showModal={modalOptions !== null}
         navigate={modalOptions?.navigate || ""}
-        onFirstBtnClick={() => {
-          if (gameState === GameState.RESTART) {
-            setGameState(GameState.CHOOSE_MARK);
-          } else {
-            setPlayers({
-              p1: { mark: Mark.CROSS, slots: [] },
-              p2: { mark: Mark.NOUGHT, slots: [] },
-            });
-            setGameState(GameState.CHOOSE_MARK);
-          }
-        }}
-        onSecondBtnClick={() => {
-          if (gameState === GameState.RESTART) {
-            setPlayers({
-              p1: { mark: Mark.CROSS, slots: [] },
-              p2: { mark: Mark.NOUGHT, slots: [] },
-            });
-            setGameState(GameState.CHOOSE_MARK);
-          } else {
-            setPlayers({
-              p1: { mark: Mark.CROSS, slots: [] },
-              p2: { mark: Mark.NOUGHT, slots: [] },
-            });
-            setGameState(GameState.CHOOSE_MARK);
-            //+ save the score
-          }
-        }}
+        onFirstBtnClick={modalOptions?.onFirstBtnClick || (() => {})}
+        onSecondBtnClick={modalOptions?.onSecondBtnClick || (() => {})}
       />
       <div className="flex justify-between items-end">
         <Image src={logo} alt="logo" className="h-10 w-20" />
         <div className="flex justify-center items-center gap-2 h-12 w-36 bg-light-green rounded-xl">
-          {players[currentPlayer].mark === Mark.CROSS ? (
+          {players[currentPlayer].mark === EMark.CROSS ? (
             <Image src={cross} alt="turn" className="h-4 w-4" />
           ) : (
             <Image src={nought} alt="turn" className="h-4 w-4" />
@@ -206,8 +134,8 @@ export default function StartGame() {
           onClick={() => {
             setGameState(GameState.RESTART);
             setPlayers({
-              p1: { mark: Mark.CROSS, slots: [] },
-              p2: { mark: Mark.NOUGHT, slots: [] },
+              p1: { mark: EMark.CROSS, slots: [] },
+              p2: { mark: EMark.NOUGHT, slots: [] },
             });
           }}
           className="flex justify-center items-center h-12 w-12 bg-silver rounded-xl ml-7"
@@ -245,20 +173,28 @@ export default function StartGame() {
       <div className="flex gap-4 justify-between">
         <div className="flex justify-center items-center h-12 w-full bg-bright-blue rounded-xl">
           <div className="flex flex-col items-center">
-            <span>X(YOU)</span>
-            <span className="font-bold">0</span>
+            {players.p1.mark === EMark.CROSS ? (
+              <span>p1 - CROSS</span>
+            ) : (
+              <span>p1 - NOUGHT</span>
+            )}
+            <span className="font-bold">{gameScore.p1}</span>
           </div>
         </div>
         <div className="flex justify-center items-center h-12 w-full bg-silver rounded-xl">
           <div className="flex flex-col items-center">
             <span>TIES</span>
-            <span className="font-bold">0</span>
+            <span className="font-bold">{gameScore.ties}</span>
           </div>
         </div>
         <div className="flex justify-center items-center h-12 w-full bg-bright-yellow rounded-xl">
           <div className="flex flex-col items-center">
-            <span>0 (CPU)</span>
-            <span className="font-bold">0</span>
+            {players.p2.mark === EMark.CROSS ? (
+              <span>p2 - CROSS</span>
+            ) : (
+              <span>p2 - NOUGHT</span>
+            )}
+            <span className="font-bold">{gameScore.p2}</span>
           </div>
         </div>
       </div>

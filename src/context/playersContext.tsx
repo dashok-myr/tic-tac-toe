@@ -7,13 +7,13 @@ import {
   useState,
 } from "react";
 
-export enum Mark {
+export enum EMark {
   CROSS = "X",
   NOUGHT = "O",
 }
 
 export interface IPlayer {
-  mark: Mark;
+  mark: EMark;
   slots: number[];
 }
 
@@ -27,16 +27,16 @@ export const PlayersContext = createContext<{
   setPlayers: Dispatch<SetStateAction<IPlayers>>;
 }>({
   players: {
-    p1: { mark: Mark.CROSS, slots: [] },
-    p2: { mark: Mark.NOUGHT, slots: [] },
+    p1: { mark: EMark.CROSS, slots: [] },
+    p2: { mark: EMark.NOUGHT, slots: [] },
   },
   setPlayers: () => {},
 });
 
 export const PlayersProvider = ({ children }: { children: ReactNode }) => {
   const [player, setPlayer] = useState<IPlayers>({
-    p1: { mark: Mark.CROSS, slots: [] },
-    p2: { mark: Mark.NOUGHT, slots: [] },
+    p1: { mark: EMark.CROSS, slots: [] },
+    p2: { mark: EMark.NOUGHT, slots: [] },
   });
 
   return (

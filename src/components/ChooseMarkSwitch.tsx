@@ -3,12 +3,12 @@ import React, { useContext, useState } from "react";
 import Image from "next/image";
 import cross from "@/icons/icon-x.svg";
 import nought from "@/icons/icon-o.svg";
-import { Mark, PlayersContext } from "@/context/playersContext";
+import { EMark, PlayersContext } from "@/context/playersContext";
 
 export default function ChooseMarkSwitch() {
   const { players, setPlayers } = useContext(PlayersContext);
-  const [currentMark, setCurrentMark] = useState<Mark>(Mark.CROSS);
-  console.log(players);
+  const [currentMark, setCurrentMark] = useState<EMark>(EMark.CROSS);
+
   return (
     <div className="bg-light-green rounded-xl p-5">
       <div className="flex flex-col justify-between gap-4 items-center">
@@ -18,14 +18,14 @@ export default function ChooseMarkSwitch() {
         <div className="flex items-center bg-dark-green p-2 h-20 w-96 rounded-xl">
           <button
             onClick={() => {
-              setCurrentMark(Mark.CROSS);
+              setCurrentMark(EMark.CROSS);
               const copyPlayerObj = { ...players };
-              copyPlayerObj.p1.mark = Mark.CROSS;
-              copyPlayerObj.p2.mark = Mark.NOUGHT;
+              copyPlayerObj.p1.mark = EMark.CROSS;
+              copyPlayerObj.p2.mark = EMark.NOUGHT;
               setPlayers(copyPlayerObj);
             }}
             className={`flex-1 ${
-              currentMark === Mark.CROSS ? "p-3 bg-silver rounded-xl" : ""
+              currentMark === EMark.CROSS ? "p-3 bg-silver rounded-xl" : ""
             }`}
           >
             <div className="flex justify-center">
@@ -34,14 +34,14 @@ export default function ChooseMarkSwitch() {
           </button>
           <button
             onClick={() => {
-              setCurrentMark(Mark.NOUGHT);
+              setCurrentMark(EMark.NOUGHT);
               const copyPlayerObj = { ...players };
-              copyPlayerObj.p1.mark = Mark.NOUGHT;
-              copyPlayerObj.p2.mark = Mark.CROSS;
+              copyPlayerObj.p1.mark = EMark.NOUGHT;
+              copyPlayerObj.p2.mark = EMark.CROSS;
               setPlayers(copyPlayerObj);
             }}
             className={`flex-1 ${
-              currentMark === Mark.NOUGHT ? "p-3 bg-silver rounded-xl" : ""
+              currentMark === EMark.NOUGHT ? "p-3 bg-silver rounded-xl" : ""
             }`}
           >
             <div className="flex justify-center">
@@ -54,7 +54,7 @@ export default function ChooseMarkSwitch() {
       <div className="flex justify-around">
         <div>
           Player 1:
-          {players.p1.mark === Mark.CROSS ? (
+          {players.p1.mark === EMark.CROSS ? (
             <div>CROSS</div>
           ) : (
             <div>NOUGHT</div>
@@ -62,7 +62,7 @@ export default function ChooseMarkSwitch() {
         </div>
         <div>
           Player 2:
-          {players.p2.mark === Mark.CROSS ? (
+          {players.p2.mark === EMark.CROSS ? (
             <div>CROSS</div>
           ) : (
             <div>NOUGHT</div>
