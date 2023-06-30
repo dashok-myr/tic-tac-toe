@@ -102,34 +102,41 @@ function getModalOptions(state: GameState) {
   }
 }
 
+function MarkIcon({ mark }: { mark: Mark }) {
+  if (mark === Mark.CROSS) {
+    return <Image src={cross} alt="cross" width="80" height="80" />;
+  }
+  return <Image src={nought} alt="nought" width="80" height="80" />;
+}
+
 export default function StartGame() {
   const { players, setPlayers } = useContext(PlayersContext);
   const { gameState, setGameState } = useContext(GameStateContext);
-  const [isCross, setIsCross] = useState(true);
+  const [isCrossTurn, setIsCrossTurn] = useState(true);
+  const [currentPlayer, setCurrentPlayer] = useState<"p1" | "p2">(
+    players.p1.mark === Mark.CROSS ? "p1" : "p2"
+  );
 
   const cellDesign = Array.from({ length: 9 }, (_, index) => index + 1);
 
   function handleOnClick(slot: number) {
-    setIsCross(!isCross);
-    const isP1Cross = players.p1.mark === Mark.CROSS;
-    const isP1Turn = isCross && isP1Cross;
     const copyPlayers = { ...players };
 
-    if (isP1Turn) {
-      copyPlayers.p1.slots.push(slot);
-      if (hasPlayerWon(players.p1.slots)) {
-        setGameState(GameState.FIRST_PLAYER_WIN);
-      }
-    } else {
-      copyPlayers.p2.slots.push(slot);
-      if (hasPlayerWon(players.p2.slots)) {
-        setGameState(GameState.SECOND_PLAYER_WIN);
-      }
+    copyPlayers[currentPlayer].slots.push(slot);
+    if (hasPlayerWon(players[currentPlayer].slots)) {
+      setGameState(
+        currentPlayer === "p1"
+          ? GameState.FIRST_PLAYER_WIN
+          : GameState.SECOND_PLAYER_WIN
+      );
     }
     if (hasTied([...players.p1.slots, ...players.p2.slots])) {
       setGameState(GameState.TIED);
     }
     setPlayers(copyPlayers);
+    setIsCrossTurn(!isCrossTurn);
+    setCurrentPlayer(currentPlayer === "p1" ? "p2" : "p1");
+    console.log(players.p1, "p1", players.p2, "p2");
   }
 
   const modalOptions = getModalOptions(gameState);
@@ -168,7 +175,7 @@ export default function StartGame() {
               p1: { mark: Mark.CROSS, slots: [] },
               p2: { mark: Mark.NOUGHT, slots: [] },
             });
-            setIsCross(true);
+            setIsCrossTurn(true);
             setGameState(GameState.CHOOSE_MARK);
           }
         }}
@@ -178,14 +185,14 @@ export default function StartGame() {
               p1: { mark: Mark.CROSS, slots: [] },
               p2: { mark: Mark.NOUGHT, slots: [] },
             });
-            setIsCross(true);
+            setIsCrossTurn(true);
             setGameState(GameState.CHOOSE_MARK);
           } else {
             setPlayers({
               p1: { mark: Mark.CROSS, slots: [] },
               p2: { mark: Mark.NOUGHT, slots: [] },
             });
-            setIsCross(true);
+            setIsCrossTurn(true);
             setGameState(GameState.CHOOSE_MARK);
             //+ save the score
           }
@@ -194,7 +201,7 @@ export default function StartGame() {
       <div className="flex justify-between items-end">
         <Image src={logo} alt="logo" className="h-10 w-20" />
         <div className="flex justify-center items-center gap-2 h-12 w-36 bg-light-green rounded-xl">
-          {isCross ? (
+          {isCrossTurn ? (
             <Image src={cross} alt="turn" className="h-4 w-4" />
           ) : (
             <Image src={nought} alt="turn" className="h-4 w-4" />
@@ -204,7 +211,7 @@ export default function StartGame() {
         <button
           onClick={() => {
             setGameState(GameState.RESTART);
-            setIsCross(true);
+            setIsCrossTurn(true);
             setPlayers({
               p1: { mark: Mark.CROSS, slots: [] },
               p2: { mark: Mark.NOUGHT, slots: [] },
@@ -230,12 +237,12 @@ export default function StartGame() {
             >
               {players.p1.slots.includes(slot) && (
                 <div className="flex justify-center">
-                  <Image src={cross} alt="turn" className="h-14 w-14" />
+                  <MarkIcon mark={players.p1.mark} />
                 </div>
               )}
               {players.p2.slots.includes(slot) && (
                 <div className="flex justify-center">
-                  <Image src={nought} alt="turn" className="h-14 w-14" />
+                  <MarkIcon mark={players.p2.mark} />
                 </div>
               )}
             </button>

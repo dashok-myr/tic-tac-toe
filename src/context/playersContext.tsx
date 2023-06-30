@@ -8,8 +8,8 @@ import {
 } from "react";
 
 export enum Mark {
-  CROSS,
-  NOUGHT,
+  CROSS = "X",
+  NOUGHT = "O",
 }
 
 export interface IPlayer {

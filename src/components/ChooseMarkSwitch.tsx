@@ -1,15 +1,14 @@
 "use client";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import Image from "next/image";
 import cross from "@/icons/icon-x.svg";
 import nought from "@/icons/icon-o.svg";
-import { useState } from "react";
 import { Mark, PlayersContext } from "@/context/playersContext";
 
 export default function ChooseMarkSwitch() {
   const { players, setPlayers } = useContext(PlayersContext);
   const [currentMark, setCurrentMark] = useState<Mark>(Mark.CROSS);
-
+  console.log(players);
   return (
     <div className="bg-light-green rounded-xl p-5">
       <div className="flex flex-col justify-between gap-4 items-center">
@@ -26,7 +25,7 @@ export default function ChooseMarkSwitch() {
               setPlayers(copyPlayerObj);
             }}
             className={`flex-1 ${
-              currentMark ? "" : "p-3 bg-silver rounded-xl"
+              currentMark === Mark.CROSS ? "p-3 bg-silver rounded-xl" : ""
             }`}
           >
             <div className="flex justify-center">
@@ -42,7 +41,7 @@ export default function ChooseMarkSwitch() {
               setPlayers(copyPlayerObj);
             }}
             className={`flex-1 ${
-              currentMark ? "p-3 bg-silver rounded-xl" : ""
+              currentMark === Mark.NOUGHT ? "p-3 bg-silver rounded-xl" : ""
             }`}
           >
             <div className="flex justify-center">
