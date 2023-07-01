@@ -51,7 +51,7 @@ export default function ChooseMarkSwitch() {
         </div>
         <div className="text-silver">REMEMBER : X GOES FIRST</div>
       </div>
-      <div className="flex justify-around">
+      <div className="flex justify-around mt-2 text-silver">
         <div>
           Player 1:
           {players.p1.mark === EMark.CROSS ? (

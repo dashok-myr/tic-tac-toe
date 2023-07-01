@@ -4,12 +4,14 @@ import Image from "next/image";
 import logo from "@/icons/logo.svg";
 import nought from "@/icons/icon-o.svg";
 import cross from "@/icons/icon-x.svg";
-import restart from "@/icons/icon-restart.svg";
 import Modal from "@/components/Modal";
 import { EMark, PlayersContext } from "@/context/playersContext";
 import { GameState, GameStateContext } from "@/context/gameState.context";
 import { GameScoreContext } from "@/context/gameScore.context";
 import useGetModalOptions from "@/app/startgame/useGetModalOptions";
+import TurnLogo from "@/app/startgame/TurnLogo";
+import RestartButton from "@/app/startgame/RestartButton";
+import GameScoreLabels from "@/app/startgame/GameScoreLabels";
 
 const winningPossibilities = [
   [1, 2, 3],
@@ -71,7 +73,6 @@ export default function StartGame() {
     players.p1.mark === EMark.CROSS ? "p1" : "p2"
   );
   const modalOptions = useGetModalOptions(gameState, setCurrentPlayer);
-
   const cellDesign = Array.from({ length: 9 }, (_, index) => index + 1);
 
   function handleOnClick(slot: number) {
@@ -122,26 +123,16 @@ export default function StartGame() {
       />
       <div className="flex justify-between items-end">
         <Image src={logo} alt="logo" className="h-10 w-20" />
-        <div className="flex justify-center items-center gap-2 h-12 w-36 bg-light-green rounded-xl">
-          {players[currentPlayer].mark === EMark.CROSS ? (
-            <Image src={cross} alt="turn" className="h-4 w-4" />
-          ) : (
-            <Image src={nought} alt="turn" className="h-4 w-4" />
-          )}
-          <div className="text-silver">TURN</div>
-        </div>
-        <button
-          onClick={() => {
+        <TurnLogo currentPlayerMark={players[currentPlayer].mark} />
+        <RestartButton
+          onRestart={() => {
             setGameState(GameState.RESTART);
             setPlayers({
               p1: { mark: EMark.CROSS, slots: [] },
               p2: { mark: EMark.NOUGHT, slots: [] },
             });
           }}
-          className="flex justify-center items-center h-12 w-12 bg-silver rounded-xl ml-7"
-        >
-          <Image src={restart} alt="restart" className="h-5 w-5" />
-        </button>
+        />
       </div>
       <div className="grid grid-cols-3 gap-4 justify-between">
         {cellDesign.map((_, index) => {
@@ -171,32 +162,13 @@ export default function StartGame() {
         })}
       </div>
       <div className="flex gap-4 justify-between">
-        <div className="flex justify-center items-center h-12 w-full bg-bright-blue rounded-xl">
-          <div className="flex flex-col items-center">
-            {players.p1.mark === EMark.CROSS ? (
-              <span>p1 - CROSS</span>
-            ) : (
-              <span>p1 - NOUGHT</span>
-            )}
-            <span className="font-bold">{gameScore.p1}</span>
-          </div>
-        </div>
-        <div className="flex justify-center items-center h-12 w-full bg-silver rounded-xl">
-          <div className="flex flex-col items-center">
-            <span>TIES</span>
-            <span className="font-bold">{gameScore.ties}</span>
-          </div>
-        </div>
-        <div className="flex justify-center items-center h-12 w-full bg-bright-yellow rounded-xl">
-          <div className="flex flex-col items-center">
-            {players.p2.mark === EMark.CROSS ? (
-              <span>p2 - CROSS</span>
-            ) : (
-              <span>p2 - NOUGHT</span>
-            )}
-            <span className="font-bold">{gameScore.p2}</span>
-          </div>
-        </div>
+        <GameScoreLabels
+          p1Mark={players.p1.mark}
+          p2Mark={players.p2.mark}
+          p1GameScore={gameScore.p1}
+          p2GameScore={gameScore.p2}
+          tiesGameScore={gameScore.ties}
+        />
       </div>
     </div>
   );
