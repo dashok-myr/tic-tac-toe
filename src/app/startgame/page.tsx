@@ -2,17 +2,15 @@
 import React, { useContext, useState } from "react";
 import Image from "next/image";
 import logo from "@/icons/logo.svg";
-import nought from "@/icons/icon-o.svg";
-import cross from "@/icons/icon-x.svg";
 import Modal from "@/components/Modal";
 import { EMark, PlayersContext } from "@/context/playersContext";
 import { GameState, GameStateContext } from "@/context/gameState.context";
-import { GameScoreContext } from "@/context/gameScore.context";
+import { GameScoreContext } from "@/app/startgame/gameScore.context";
 import useGetModalOptions from "@/app/startgame/useGetModalOptions";
 import TurnLogo from "@/app/startgame/TurnLogo";
 import RestartButton from "@/app/startgame/RestartButton";
 import GameScoreLabels from "@/app/startgame/GameScoreLabels";
-import { GameScoreProvider } from "@/context/gameScore.context";
+import SlotButton from "@/app/startgame/SlotButton";
 
 const winningPossibilities = [
   [1, 2, 3],
@@ -57,13 +55,6 @@ function hasPlayerWon(mark: number[]) {
 
 function hasTied(slots: number[]) {
   return slots.length === 9 && !hasPlayerWon(slots);
-}
-
-function MarkIcon({ mark }: { mark: EMark }) {
-  if (mark === EMark.CROSS) {
-    return <Image src={cross} alt="cross" width="70" height="70" />;
-  }
-  return <Image src={nought} alt="nought" width="70" height="70" />;
 }
 
 export default function StartGame() {
@@ -140,26 +131,11 @@ export default function StartGame() {
           {cellDesign.map((_, index) => {
             const slot = index + 1;
             return (
-              <button
-                onClick={() => handleOnClick(slot)}
-                disabled={
-                  players.p1.slots.includes(slot) ||
-                  players.p2.slots.includes(slot)
-                }
+              <SlotButton
                 key={slot}
-                className="w-full h-28 bg-light-green rounded-xl cursor-pointer active:translate-y-2 active:[box-shadow:0_0px_0_0_#0d151a] active:border-b-[0px] transition-all duration-150 [box-shadow:0_10px_0_0_#0d151a] border-b-[1px] border-y-light-green"
-              >
-                {players.p1.slots.includes(slot) && (
-                  <div className="flex justify-center">
-                    <MarkIcon mark={players.p1.mark} />
-                  </div>
-                )}
-                {players.p2.slots.includes(slot) && (
-                  <div className="flex justify-center">
-                    <MarkIcon mark={players.p2.mark} />
-                  </div>
-                )}
-              </button>
+                onClick={() => handleOnClick(slot)}
+                slot={slot}
+              />
             );
           })}
         </div>
