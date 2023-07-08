@@ -12,6 +12,7 @@ import useGetModalOptions from "@/app/startgame/useGetModalOptions";
 import TurnLogo from "@/app/startgame/TurnLogo";
 import RestartButton from "@/app/startgame/RestartButton";
 import GameScoreLabels from "@/app/startgame/GameScoreLabels";
+import { GameScoreProvider } from "@/context/gameScore.context";
 
 const winningPossibilities = [
   [1, 2, 3],
@@ -111,65 +112,67 @@ export default function StartGame() {
   }
 
   return (
-    <div className="flex flex-col justify-center gap-10 mx-auto w-1/2 md:w-1/4 h-screen">
+    <>
       <Modal
         gameResult={modalOptions?.gameResult || ""}
         firstBtnLabel={modalOptions?.firstBtnLabel || ""}
         secondBtnLabel={modalOptions?.secondBtnLabel || ""}
         showModal={modalOptions !== null}
-        navigate={modalOptions?.navigate || ""}
+        navigateQuitButton={modalOptions?.navigateQuitButton || ""}
         onFirstBtnClick={modalOptions?.onFirstBtnClick || (() => {})}
         onSecondBtnClick={modalOptions?.onSecondBtnClick || (() => {})}
       />
-      <div className="flex justify-between items-end">
-        <Image src={logo} alt="logo" className="h-10 w-20" />
-        <TurnLogo currentPlayerMark={players[currentPlayer].mark} />
-        <RestartButton
-          onRestart={() => {
-            setGameState(GameState.RESTART);
-            setPlayers({
-              p1: { mark: EMark.CROSS, slots: [] },
-              p2: { mark: EMark.NOUGHT, slots: [] },
-            });
-          }}
-        />
+      <div className="flex flex-col justify-center gap-10 mx-auto w-1/2 md:w-1/4 h-screen">
+        <div className="flex justify-between items-end">
+          <Image src={logo} alt="logo" className="h-10 w-20" />
+          <TurnLogo currentPlayerMark={players[currentPlayer].mark} />
+          <RestartButton
+            onRestart={() => {
+              setGameState(GameState.RESTART);
+              setPlayers({
+                p1: { mark: EMark.CROSS, slots: [] },
+                p2: { mark: EMark.NOUGHT, slots: [] },
+              });
+            }}
+          />
+        </div>
+        <div className="grid grid-cols-3 gap-4 justify-between">
+          {cellDesign.map((_, index) => {
+            const slot = index + 1;
+            return (
+              <button
+                onClick={() => handleOnClick(slot)}
+                disabled={
+                  players.p1.slots.includes(slot) ||
+                  players.p2.slots.includes(slot)
+                }
+                key={slot}
+                className="w-full h-28 bg-light-green rounded-xl cursor-pointer active:translate-y-2 active:[box-shadow:0_0px_0_0_#0d151a] active:border-b-[0px] transition-all duration-150 [box-shadow:0_10px_0_0_#0d151a] border-b-[1px] border-y-light-green"
+              >
+                {players.p1.slots.includes(slot) && (
+                  <div className="flex justify-center">
+                    <MarkIcon mark={players.p1.mark} />
+                  </div>
+                )}
+                {players.p2.slots.includes(slot) && (
+                  <div className="flex justify-center">
+                    <MarkIcon mark={players.p2.mark} />
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+        <div className="flex gap-4 justify-between">
+          <GameScoreLabels
+            p1Mark={players.p1.mark}
+            p2Mark={players.p2.mark}
+            p1GameScore={gameScore.p1}
+            p2GameScore={gameScore.p2}
+            tiesGameScore={gameScore.ties}
+          />
+        </div>
       </div>
-      <div className="grid grid-cols-3 gap-4 justify-between">
-        {cellDesign.map((_, index) => {
-          const slot = index + 1;
-          return (
-            <button
-              onClick={() => handleOnClick(slot)}
-              disabled={
-                players.p1.slots.includes(slot) ||
-                players.p2.slots.includes(slot)
-              }
-              key={slot}
-              className="w-full h-28 bg-light-green rounded-xl cursor-pointer active:translate-y-2 active:[box-shadow:0_0px_0_0_#0d151a] active:border-b-[0px] transition-all duration-150 [box-shadow:0_10px_0_0_#0d151a] border-b-[1px] border-y-light-green"
-            >
-              {players.p1.slots.includes(slot) && (
-                <div className="flex justify-center">
-                  <MarkIcon mark={players.p1.mark} />
-                </div>
-              )}
-              {players.p2.slots.includes(slot) && (
-                <div className="flex justify-center">
-                  <MarkIcon mark={players.p2.mark} />
-                </div>
-              )}
-            </button>
-          );
-        })}
-      </div>
-      <div className="flex gap-4 justify-between">
-        <GameScoreLabels
-          p1Mark={players.p1.mark}
-          p2Mark={players.p2.mark}
-          p1GameScore={gameScore.p1}
-          p2GameScore={gameScore.p2}
-          tiesGameScore={gameScore.ties}
-        />
-      </div>
-    </div>
+    </>
   );
 }

@@ -4,6 +4,7 @@ import Image from "next/image";
 import cross from "@/icons/icon-x.svg";
 import nought from "@/icons/icon-o.svg";
 import { EMark, PlayersContext } from "@/context/playersContext";
+import classnames from "classnames";
 
 export default function ChooseMarkSwitch() {
   const { players, setPlayers } = useContext(PlayersContext);
@@ -24,9 +25,9 @@ export default function ChooseMarkSwitch() {
               copyPlayerObj.p2.mark = EMark.NOUGHT;
               setPlayers(copyPlayerObj);
             }}
-            className={`flex-1 ${
-              currentMark === EMark.CROSS ? "p-3 bg-silver rounded-xl" : ""
-            }`}
+            className={classnames("flex-1", {
+              "p-3 bg-silver rounded-xl": currentMark === EMark.CROSS,
+            })}
           >
             <div className="flex justify-center">
               <Image src={cross} alt="x" width="40" height="40" />
@@ -40,9 +41,9 @@ export default function ChooseMarkSwitch() {
               copyPlayerObj.p2.mark = EMark.CROSS;
               setPlayers(copyPlayerObj);
             }}
-            className={`flex-1 ${
-              currentMark === EMark.NOUGHT ? "p-3 bg-silver rounded-xl" : ""
-            }`}
+            className={classnames("flex-1", {
+              "p-3 bg-silver rounded-xl": currentMark === EMark.NOUGHT,
+            })}
           >
             <div className="flex justify-center">
               <Image src={nought} alt="o" width="40" height="40" />

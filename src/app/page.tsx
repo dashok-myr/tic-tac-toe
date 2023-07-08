@@ -2,8 +2,9 @@
 import React from "react";
 import logo from "../icons/logo.svg";
 import Image from "next/image";
-import NewGameButtons from "@/components/NewGameButtons";
 import ChooseMarkSwitch from "@/components/ChooseMarkSwitch";
+import NewGameWithCpuButton from "@/components/NewGameWithPlayerButton";
+import NewGameWithPlayerButton from "@/components/NewGameWithCpuButton";
 
 export default function Home() {
   return (
@@ -18,7 +19,10 @@ export default function Home() {
             className="self-center"
           />
           <ChooseMarkSwitch />
-          <NewGameButtons />
+          <div className="flex flex-col gap-6">
+            <NewGameWithPlayerButton />
+            <NewGameWithCpuButton />
+          </div>
         </div>
       </main>
     </>

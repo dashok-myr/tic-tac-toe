@@ -15,7 +15,7 @@ export default function useGetModalOptions(
         gameResult: "YOU WON!",
         firstBtnLabel: "QUIT",
         secondBtnLabel: "NEXT ROUND",
-        navigate: "/",
+        navigateQuitButton: "/",
         onFirstBtnClick: () => {
           setGameState(GameState.CHOOSE_GAME_TYPE);
           setPlayers({
@@ -37,7 +37,7 @@ export default function useGetModalOptions(
         gameResult: "PLAYER 1 WINS!",
         firstBtnLabel: "QUIT",
         secondBtnLabel: "NEXT ROUND",
-        navigate: "/",
+        navigateQuitButton: "/",
         onFirstBtnClick: () => {
           setGameState(GameState.CHOOSE_GAME_TYPE);
           setPlayers({
@@ -59,7 +59,7 @@ export default function useGetModalOptions(
         gameResult: "PLAYER 2 WINS!",
         firstBtnLabel: "QUIT",
         secondBtnLabel: "NEXT ROUND",
-        navigate: "/",
+        navigateQuitButton: "/",
         onFirstBtnClick: () => {
           setGameState(GameState.CHOOSE_GAME_TYPE);
           setPlayers({
@@ -81,7 +81,7 @@ export default function useGetModalOptions(
         gameResult: "IT'S A TIE!",
         firstBtnLabel: "QUIT",
         secondBtnLabel: "NEXT ROUND",
-        navigate: "/",
+        navigateQuitButton: "/",
         onFirstBtnClick: () => {
           setGameState(GameState.CHOOSE_GAME_TYPE);
           setPlayers({
@@ -103,7 +103,7 @@ export default function useGetModalOptions(
         gameResult: "ON NO, YOU LOST...",
         firstBtnLabel: "QUIT",
         secondBtnLabel: "NEXT ROUND",
-        navigate: "/",
+        navigateQuitButton: "/",
         onFirstBtnClick: () => {
           setGameState(GameState.CHOOSE_GAME_TYPE);
           setPlayers({
@@ -125,7 +125,7 @@ export default function useGetModalOptions(
         gameResult: "RESTART THE GAME?",
         firstBtnLabel: "NO, CANCEL",
         secondBtnLabel: "YES, RESTART",
-        navigate: "",
+        navigateQuitButton: "",
         onFirstBtnClick: () => {
           setGameState(GameState.PLAYING);
         },

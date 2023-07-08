@@ -1,8 +1,8 @@
 import "./globals.css";
-import { Inter } from "next/font/google";
-import { ReactNode } from "react";
-import { PlayersProvider } from "@/context/playersContext";
-import { GameStateProvider } from "@/context/gameState.context";
+import {Inter} from "next/font/google";
+import {ReactNode} from "react";
+import {PlayersProvider} from "@/context/playersContext";
+import {GameStateProvider} from "@/context/gameState.context";
 import { GameScoreProvider } from "@/context/gameScore.context";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -17,9 +17,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <body className={inter.className}>
         <PlayersProvider>
-          <GameScoreProvider>
-            <GameStateProvider>{children}</GameStateProvider>
-          </GameScoreProvider>
+            <GameStateProvider>
+              <GameScoreProvider>
+              {children}
+              </GameScoreProvider>
+            </GameStateProvider>
         </PlayersProvider>
       </body>
     </html>

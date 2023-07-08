@@ -4,5 +4,5 @@
 
 
 body {
-  background-color: #1a2a33
+  @apply bg-dark-green
 }
