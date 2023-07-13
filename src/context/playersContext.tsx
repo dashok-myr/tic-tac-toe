@@ -21,7 +21,6 @@ export interface IPlayers {
   p1: IPlayer;
   p2: IPlayer;
 }
-
 export const PlayersContext = createContext<{
   players: IPlayers;
   setPlayers: Dispatch<SetStateAction<IPlayers>>;
