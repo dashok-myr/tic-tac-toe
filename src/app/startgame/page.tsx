@@ -1,10 +1,10 @@
 "use client";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import logo from "@/icons/logo.svg";
 import Modal from "@/components/Modal";
 import { EMark, PlayersContext } from "@/context/playersContext";
-import { GameState, GameStateContext } from "@/context/gameState.context";
+import { EGameState, GameStateContext } from "@/context/gameState.context";
 import { GameScoreContext } from "@/app/startgame/gameScore.context";
 import useGetModalOptions from "@/app/startgame/useGetModalOptions";
 import TurnLogo from "@/app/startgame/TurnLogo";
@@ -15,41 +15,47 @@ import { EGameType, GameTypeContext } from "@/context/gameType";
 
 const winningPossibilities = [
   [1, 2, 3],
-  [4, 5, 6],
-  [7, 8, 9],
   [1, 4, 7],
-  [2, 5, 8],
-  [3, 6, 9],
   [1, 5, 9],
+  [2, 5, 8],
+  [3, 2, 1],
   [3, 5, 7],
+  [3, 6, 9],
+  [4, 5, 6],
+  [6, 5, 4],
+  [7, 4, 1],
+  [7, 5, 3],
+  [7, 8, 9],
+  [8, 5, 2],
+  [9, 5, 1],
+  [9, 6, 3],
+  [9, 8, 7],
 ];
 
 const cellDesign = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
+function checkArrayIncludesArray(array1: number[], array2: number[]) {
+  for (let num1 of array1) {
+    if (!array2.includes(num1)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function hasPlayerWon(mark: number[]) {
   if (mark.length < 3) return;
 
-  for (let index = 0; index < winningPossibilities.length; index++) {
-    let matches = 0;
-    const possibility = winningPossibilities[index];
-    for (let indexMark = 0; indexMark < mark.length; indexMark++) {
-      const markNumber = mark[indexMark];
-      if (possibility.includes(markNumber)) {
-        matches++;
-      } else {
-        break;
-      }
-
-      if (matches === 3) {
-        return true;
-      }
+  for (let possibility of winningPossibilities) {
+    if (checkArrayIncludesArray(possibility, mark)) {
+      return true;
     }
   }
   return false;
 }
 
 function hasTied(slots: number[]) {
-  return slots.length === 9 && !hasPlayerWon(slots);
+  return slots.length === 9;
 }
 
 function delay(seconds: number) {
@@ -122,6 +128,8 @@ function isWinningMove(positions: number[]) {
   return false;
 }
 
+//p1 is nought => the cpu doesn't start the game
+
 export default function StartGame() {
   const { players, setPlayers } = useContext(PlayersContext);
   const { gameState, setGameState } = useContext(GameStateContext);
@@ -132,7 +140,7 @@ export default function StartGame() {
   );
   const modalOptions = useGetModalOptions(gameState, setCurrentPlayer);
 
-  async function handleOnClick(slot: number) {
+  async function handleOnSlotClick(slot: number) {
     if (gameType === EGameType.PVP) {
       const copyPlayers = { ...players };
 
@@ -140,8 +148,8 @@ export default function StartGame() {
       if (hasPlayerWon(players[currentPlayer].slots)) {
         setGameState(
           currentPlayer === "p1"
-            ? GameState.FIRST_PLAYER_WIN
-            : GameState.SECOND_PLAYER_WIN
+            ? EGameState.FIRST_PLAYER_WIN
+            : EGameState.SECOND_PLAYER_WIN
         );
 
         if (currentPlayer === "p1") {
@@ -158,8 +166,8 @@ export default function StartGame() {
         }
       }
 
-      if (hasTied([...players.p1.slots, ...players.p2.slots])) {
-        setGameState(GameState.TIED);
+      if (hasTied([...copyPlayers.p1.slots, ...copyPlayers.p2.slots])) {
+        setGameState(EGameState.TIED);
         setGameScore({
           ...gameScore,
           ties: gameScore.ties + 1,
@@ -172,16 +180,68 @@ export default function StartGame() {
       copyPlayers.p1.slots.push(slot);
       setCurrentPlayer(currentPlayer === "p1" ? "p2" : "p1");
       setPlayers(copyPlayers);
-      await delay(2);
 
-      const copyPlayersCPU = { ...players };
+      if (hasPlayerWon(copyPlayers.p1.slots)) {
+        setGameState(EGameState.FIRST_PLAYER_WIN);
+        setGameScore({
+          ...gameScore,
+          p1: gameScore.p1 + 1,
+        });
+        return;
+      }
 
+      if ([...copyPlayers.p1.slots, ...copyPlayers.p2.slots].length === 9) {
+        setGameState(EGameState.TIED);
+        setGameScore({
+          ...gameScore,
+          ties: gameScore.ties + 1,
+        });
+
+        return;
+      }
+
+      await delay(0.5);
+
+      const copyPlayersCPU = { ...copyPlayers };
       const cpuMove = getBestMove(players.p1.slots, players.p2.slots, "p2");
       copyPlayersCPU.p2.slots.push(cpuMove);
       setCurrentPlayer(currentPlayer === "p1" ? "p2" : "p1");
       setPlayers(copyPlayersCPU);
+
+      if (hasPlayerWon(players.p2.slots)) {
+        setGameState(EGameState.SECOND_PLAYER_WIN);
+        setGameScore({
+          ...gameScore,
+          p2: gameScore.p2 + 1,
+        });
+      }
+
+      const allSlots = [...copyPlayers.p1.slots, ...copyPlayersCPU.p2.slots];
+      if (hasTied(allSlots)) {
+        setGameState(EGameState.TIED);
+        setGameScore({
+          ...gameScore,
+          ties: gameScore.ties + 1,
+        });
+      }
     }
   }
+
+  useEffect(() => {
+    if (
+      gameType === EGameType.CPU &&
+      players.p2.mark === EMark.CROSS &&
+      players.p2.slots.length === 0
+    ) {
+      delay(0.5).then(() => {
+        const copyPlayersCPU = { ...players };
+        const cpuMove = getBestMove(players.p1.slots, players.p2.slots, "p2");
+        copyPlayersCPU.p2.slots.push(cpuMove);
+        setCurrentPlayer(currentPlayer === "p1" ? "p2" : "p1");
+        setPlayers(copyPlayersCPU);
+      });
+    }
+  }, [players.p2.slots.length]);
 
   return (
     <>
@@ -200,7 +260,7 @@ export default function StartGame() {
           <TurnLogo currentPlayerMark={players[currentPlayer].mark} />
           <RestartButton
             onRestart={() => {
-              setGameState(GameState.RESTART);
+              setGameState(EGameState.RESTART);
               setPlayers({
                 p1: { mark: EMark.CROSS, slots: [] },
                 p2: { mark: EMark.NOUGHT, slots: [] },
@@ -214,7 +274,7 @@ export default function StartGame() {
             return (
               <SlotButton
                 key={slot}
-                onClick={() => handleOnClick(slot)}
+                onClick={() => handleOnSlotClick(slot)}
                 slot={slot}
               />
             );

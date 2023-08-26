@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-export enum GameState {
+export enum EGameState {
   CHOOSE_GAME_TYPE,
   PLAYING,
   FIRST_PLAYER_WIN,
@@ -19,16 +19,16 @@ export enum GameState {
 }
 
 export const GameStateContext = createContext<{
-  gameState: GameState;
-  setGameState: Dispatch<SetStateAction<GameState>>;
+  gameState: EGameState;
+  setGameState: Dispatch<SetStateAction<EGameState>>;
 }>({
-  gameState: GameState.CHOOSE_GAME_TYPE,
+  gameState: EGameState.CHOOSE_GAME_TYPE,
   setGameState: () => {},
 });
 
 export const GameStateProvider = ({ children }: { children: ReactNode }) => {
-  const [gameState, setGameState] = useState<GameState>(
-    GameState.CHOOSE_GAME_TYPE
+  const [gameState, setGameState] = useState<EGameState>(
+    EGameState.CHOOSE_GAME_TYPE
   );
 
   return (
