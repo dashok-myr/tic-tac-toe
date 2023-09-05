@@ -1,10 +1,12 @@
 import { useContext, useState } from "react";
-import { EMark, PlayersContext } from "@/context/playersContext";
+import { EMark, PlayersContext } from "@/providers/PlayersProvider";
+
+export type IPlayerId = "p1" | "p2";
 
 export default function useCurrentPlayer() {
   const { players } = useContext(PlayersContext);
 
-  const [currentPlayer, setCurrentPlayer] = useState<"p1" | "p2">(
+  const [currentPlayer, setCurrentPlayer] = useState<IPlayerId>(
     players.p1.mark === EMark.CROSS ? "p1" : "p2"
   );
 
@@ -23,4 +25,3 @@ export default function useCurrentPlayer() {
     resetCurrentPlayer,
   };
 }
-2;

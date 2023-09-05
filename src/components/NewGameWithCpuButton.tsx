@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React, { useContext } from "react";
-import { EGameType, GameTypeContext } from "@/context/gameType";
+import { EGameType, GameTypeContext } from "@/providers/GameTypeProvider";
 
 export default function NewGameWithPlayerButton() {
   const { setGameType } = useContext(GameTypeContext);

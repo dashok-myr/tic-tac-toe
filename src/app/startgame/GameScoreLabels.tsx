@@ -1,4 +1,4 @@
-import { EMark } from "@/context/playersContext";
+import { EMark } from "@/providers/PlayersProvider";
 import React from "react";
 
 interface IGameScoreLabels {

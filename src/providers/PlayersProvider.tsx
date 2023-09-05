@@ -21,6 +21,7 @@ export interface IPlayers {
   p1: IPlayer;
   p2: IPlayer;
 }
+
 export const PlayersContext = createContext<{
   players: IPlayers;
   setPlayers: Dispatch<SetStateAction<IPlayers>>;
@@ -38,7 +39,7 @@ export const PlayersContext = createContext<{
   updatePlayersMarks: () => {},
 });
 
-export const PlayersProvider = ({ children }: { children: ReactNode }) => {
+export default function PlayersProvider({ children }: { children: ReactNode }) {
   const [players, setPlayers] = useState<IPlayers>({
     p1: { mark: EMark.CROSS, slots: [] },
     p2: { mark: EMark.NOUGHT, slots: [] },
@@ -78,4 +79,4 @@ export const PlayersProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </PlayersContext.Provider>
   );
-};
+}

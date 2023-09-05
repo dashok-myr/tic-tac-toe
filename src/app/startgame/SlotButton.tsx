@@ -1,4 +1,4 @@
-import { EMark, PlayersContext } from "@/context/playersContext";
+import { EMark, PlayersContext } from "@/providers/PlayersProvider";
 import Image from "next/image";
 import cross from "@/icons/icon-x.svg";
 import nought from "@/icons/icon-o.svg";

@@ -1,6 +1,6 @@
-import { EGameState, GameStateContext } from "@/context/gameState.context";
+import { EGameState, GameStateContext } from "@/providers/GameStateProvider";
 import { useContext } from "react";
-import { PlayersContext } from "@/context/playersContext";
+import { PlayersContext } from "@/providers/PlayersProvider";
 
 export default function useGetModalOptions(
   state: EGameState,

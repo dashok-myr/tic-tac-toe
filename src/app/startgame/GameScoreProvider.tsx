@@ -6,7 +6,8 @@ import {
   SetStateAction,
   useState,
 } from "react";
-import { IPlayerId } from "@/context/gameState.context";
+
+import { IPlayerId } from "@/app/startgame/useCurrentPlayer";
 
 export interface IGameScore {
   p1: number;
@@ -14,24 +15,26 @@ export interface IGameScore {
   ties: number;
 }
 
+const DEFAULT_SCORE = {
+  p1: 0,
+  p2: 0,
+  ties: 0,
+};
+
 export const GameScoreContext = createContext<{
   gameScore: IGameScore;
   setGameScore: Dispatch<SetStateAction<IGameScore>>;
   updateScore: (currentPlayer: IPlayerId) => void;
   incrementTieScoreByOne: () => void;
 }>({
-  gameScore: { p1: 0, p2: 0, ties: 0 },
+  gameScore: DEFAULT_SCORE,
   setGameScore: () => {},
   updateScore: () => {},
   incrementTieScoreByOne: () => {},
 });
 
 export const GameScoreProvider = ({ children }: { children: ReactNode }) => {
-  const [gameScore, setGameScore] = useState<IGameScore>({
-    p1: 0,
-    p2: 0,
-    ties: 0,
-  });
+  const [gameScore, setGameScore] = useState<IGameScore>(DEFAULT_SCORE);
 
   const updateScore = (currentPlayer: IPlayerId) => {
     setGameScore({

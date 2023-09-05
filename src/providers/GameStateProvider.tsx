@@ -6,6 +6,7 @@ import React, {
   SetStateAction,
   useState,
 } from "react";
+import { IPlayerId } from "@/app/startgame/useCurrentPlayer";
 
 export enum EGameState {
   CHOOSE_GAME_TYPE,
@@ -17,8 +18,6 @@ export enum EGameState {
   LOST,
   RESTART,
 }
-
-export type IPlayerId = "p1" | "p2";
 
 export const GameStateContext = createContext<{
   gameState: EGameState;
@@ -32,7 +31,11 @@ export const GameStateContext = createContext<{
   setTieGame: () => {},
 });
 
-export const GameStateProvider = ({ children }: { children: ReactNode }) => {
+export default function GameStateProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const [gameState, setGameState] = useState<EGameState>(
     EGameState.CHOOSE_GAME_TYPE
   );
@@ -56,4 +59,4 @@ export const GameStateProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </GameStateContext.Provider>
   );
-};
+}

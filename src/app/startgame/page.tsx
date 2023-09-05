@@ -3,51 +3,35 @@ import React, { useContext, useEffect } from "react";
 import Image from "next/image";
 import logo from "@/icons/logo.svg";
 import Modal from "@/components/Modal";
-import { EMark, PlayersContext } from "@/context/playersContext";
-import { EGameState, GameStateContext } from "@/context/gameState.context";
-import { GameScoreContext } from "@/app/startgame/gameScore.context";
+import { EMark, PlayersContext } from "@/providers/PlayersProvider";
+import { EGameState, GameStateContext } from "@/providers/GameStateProvider";
+import { GameScoreContext } from "@/app/startgame/GameScoreProvider";
 import useGetModalOptions from "@/app/startgame/useGetModalOptions";
 import TurnLogo from "@/app/startgame/TurnLogo";
 import RestartButton from "@/app/startgame/RestartButton";
 import GameScoreLabels from "@/app/startgame/GameScoreLabels";
 import SlotButton from "@/app/startgame/SlotButton";
-import { EGameType, GameTypeContext } from "@/context/gameType";
+import { EGameType, GameTypeContext } from "@/providers/GameTypeProvider";
 import useCurrentPlayer from "@/app/startgame/useCurrentPlayer";
+import getBestMove from "@/app/startgame/getBestMove";
+import { WINNING_POSSIBILITIES } from "@/app/startgame/constants";
+import delay from "@/utils/delay";
 
-const winningPossibilities = [
-  [1, 2, 3],
-  [1, 4, 7],
-  [1, 5, 9],
-  [2, 5, 8],
-  [3, 2, 1],
-  [3, 5, 7],
-  [3, 6, 9],
-  [4, 5, 6],
-  [6, 5, 4],
-  [7, 4, 1],
-  [7, 5, 3],
-  [7, 8, 9],
-  [8, 5, 2],
-  [9, 5, 1],
-  [9, 6, 3],
-  [9, 8, 7],
-];
-
-const cellDesign = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-function checkArrayIncludesArray(array1: number[], array2: number[]) {
-  for (let num1 of array1) {
-    if (!array2.includes(num1)) {
-      return false;
-    }
-  }
-  return true;
-}
+const CELL_DESIGN = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 function hasPlayerWon(mark: number[]) {
+  function checkArrayIncludesArray(array1: number[], array2: number[]) {
+    for (let num1 of array1) {
+      if (!array2.includes(num1)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   if (mark.length < 3) return;
 
-  for (let possibility of winningPossibilities) {
+  for (let possibility of WINNING_POSSIBILITIES) {
     if (checkArrayIncludesArray(possibility, mark)) {
       return true;
     }
@@ -57,76 +41,6 @@ function hasPlayerWon(mark: number[]) {
 
 function hasTied(slots: number[]) {
   return slots.length === 9;
-}
-
-function delay(seconds: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, seconds * 1000);
-  });
-}
-
-function getBestMove(
-  player1Positions: number[],
-  player2Positions: number[],
-  currentTurn: "p1" | "p2"
-) {
-  const cellDesign = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  // Remove occupied positions from the available positions array
-  player1Positions.concat(player2Positions).forEach((position) => {
-    const index = cellDesign.indexOf(position);
-    if (index !== -1) {
-      cellDesign.splice(index, 1);
-    }
-  });
-
-  // Determine the player's opponent
-  const opponentPositions =
-    currentTurn === "p1" ? player2Positions : player1Positions;
-
-  // Check for winning moves for the current player
-  for (let i = 0; i < cellDesign.length; i += 1) {
-    const currentPositions =
-      currentTurn === "p1"
-        ? player1Positions.slice()
-        : player2Positions.slice();
-    currentPositions.push(cellDesign[i]);
-
-    // Check if the current position leads to a win
-    if (isWinningMove(currentPositions)) {
-      return cellDesign[i];
-    }
-  }
-
-  // Check for winning moves for the opponent and block them
-  for (let j = 0; j < cellDesign.length; j += 1) {
-    const opponentPositionsCopy = opponentPositions.slice();
-    opponentPositionsCopy.push(cellDesign[j]);
-
-    // Check if the opponent's position leads to a win
-    if (isWinningMove(opponentPositionsCopy)) {
-      return cellDesign[j];
-    }
-  }
-
-  // If no winning moves are available, return a random position
-  return cellDesign[Math.floor(Math.random() * cellDesign.length)];
-}
-
-// Helper function to check if a given set of positions leads to a win
-function isWinningMove(positions: number[]) {
-  // Check if any winning combination is present in the given positions
-  for (let i = 0; i < winningPossibilities.length; i += 1) {
-    const combination = winningPossibilities[i];
-    if (
-      combination.every((position) => {
-        return positions.includes(position);
-      })
-    ) {
-      return true;
-    }
-  }
-
-  return false;
 }
 
 export default function StartGame() {
@@ -247,7 +161,7 @@ export default function StartGame() {
           />
         </div>
         <div className="grid grid-cols-3 gap-4 justify-between">
-          {cellDesign.map((_, index) => {
+          {CELL_DESIGN.map((_, index) => {
             const slot = index + 1;
             return (
               <SlotButton

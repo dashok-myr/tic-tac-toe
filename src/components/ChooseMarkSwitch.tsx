@@ -3,7 +3,7 @@ import React, { useContext, useState } from "react";
 import Image from "next/image";
 import cross from "@/icons/icon-x.svg";
 import nought from "@/icons/icon-o.svg";
-import { EMark, PlayersContext } from "@/context/playersContext";
+import { EMark, PlayersContext } from "@/providers/PlayersProvider";
 import classnames from "classnames";
 
 export default function ChooseMarkSwitch() {

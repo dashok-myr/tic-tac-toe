@@ -1,10 +1,10 @@
 "use client";
 import React, {
   createContext,
-  SetStateAction,
   Dispatch,
-  useState,
   ReactNode,
+  SetStateAction,
+  useState,
 } from "react";
 
 export enum EGameType {
@@ -20,11 +20,15 @@ export const GameTypeContext = createContext<{
   setGameType: () => {},
 });
 
-export const GameTypeProvider = ({ children }: { children: ReactNode }) => {
+export default function GameTypeProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const [gameType, setGameType] = useState<EGameType>(EGameType.PVP);
   return (
     <GameTypeContext.Provider value={{ gameType, setGameType }}>
       {children}
     </GameTypeContext.Provider>
   );
-};
+}

@@ -1,9 +1,9 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
-import { PlayersProvider } from "@/context/playersContext";
-import { GameStateProvider } from "@/context/gameState.context";
-import { GameTypeProvider } from "@/context/gameType";
+import PlayersProvider from "@/providers/PlayersProvider";
+import GameStateProvider from "@/providers/GameStateProvider";
+import GameTypeProvider from "@/providers/GameTypeProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
