@@ -1,9 +1,9 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import Image from "next/image";
 import logo from "@/icons/logo.svg";
 import Modal from "@/components/Modal";
-import { EMark, PlayersContext } from "@/providers/PlayersProvider";
+import { PlayersContext } from "@/providers/PlayersProvider";
 import { EGameState, GameStateContext } from "@/providers/GameStateProvider";
 import { GameScoreContext } from "@/app/startgame/GameScoreProvider";
 import useGetModalOptions from "@/app/startgame/useGetModalOptions";
@@ -16,6 +16,7 @@ import useCurrentPlayer from "@/app/startgame/useCurrentPlayer";
 import getBestMove from "@/app/startgame/getBestMove";
 import { WINNING_POSSIBILITIES } from "@/app/startgame/constants";
 import delay from "@/utils/delay";
+import useOnCPUGameStart from "@/app/startgame/useOnCPUGameStart";
 
 const CELL_DESIGN = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -120,22 +121,15 @@ export default function StartGame() {
     setCurrentPlayer("p1");
   };
 
-  useEffect(() => {
-    if (
-      gameType === EGameType.CPU &&
-      players.p2.mark === EMark.CROSS &&
-      players.p2.slots.length === 0
-    ) {
-      setIsSCPUPlaying(true);
-      delay(0.5).then(() => {
-        const cpuMove = getBestMove(players.p1.slots, players.p2.slots, "p2");
-        appendToPlayerSlots("p2", cpuMove);
-        setCurrentPlayer("p1");
-        setIsSCPUPlaying(false);
-      });
-    }
-    /* eslint-disable react-hooks/exhaustive-deps */
-  }, [players.p2.slots.length]);
+  useOnCPUGameStart(async () => {
+    setIsSCPUPlaying(true);
+    delay(0.5).then(() => {
+      const cpuMove = getBestMove(players.p1.slots, players.p2.slots, "p2");
+      appendToPlayerSlots("p2", cpuMove);
+      setCurrentPlayer("p1");
+      setIsSCPUPlaying(false);
+    });
+  });
 
   return (
     <>
