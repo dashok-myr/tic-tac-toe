@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import logo from "@/icons/logo.svg";
 import Modal from "@/components/Modal";
@@ -44,12 +44,15 @@ function hasTied(slots: number[]) {
 }
 
 export default function StartGame() {
-  const { players, setPlayers, resetPlayers } = useContext(PlayersContext);
+  const { players, resetPlayers, appendToPlayerSlots } =
+    useContext(PlayersContext);
   const { gameState, setGameState, setWinner, setTieGame } =
     useContext(GameStateContext);
   const { gameScore, updateScore, incrementTieScoreByOne } =
     useContext(GameScoreContext);
   const { gameType } = useContext(GameTypeContext);
+
+  const [isCPUPlaying, setIsSCPUPlaying] = useState(false);
 
   const {
     currentPlayer,
@@ -59,67 +62,63 @@ export default function StartGame() {
   } = useCurrentPlayer();
   const modalOptions = useGetModalOptions(gameState, resetCurrentPlayer);
 
-  async function handleOnSlotClick(slot: number) {
-    if (gameType === EGameType.PVP) {
-      const copyPlayers = { ...players };
-      copyPlayers[currentPlayer].slots.push(slot);
+  const handlePVPGame = (slot: number) => {
+    appendToPlayerSlots(currentPlayer, slot);
 
-      if (hasPlayerWon(players[currentPlayer].slots)) {
-        setWinner(currentPlayer);
-        updateScore(currentPlayer);
-        return;
-      }
-
-      if (hasTied([...copyPlayers.p1.slots, ...copyPlayers.p2.slots])) {
-        setTieGame();
-        incrementTieScoreByOne();
-        return;
-      }
-
-      setPlayers(copyPlayers);
-      toggleCurrentPlayer();
-    } else if (gameType === EGameType.CPU) {
-      const copyPlayers = { ...players };
-      copyPlayers.p1.slots.push(slot);
-
-      if (hasPlayerWon(copyPlayers.p1.slots)) {
-        setWinner("p1");
-        updateScore("p1");
-        return;
-      }
-
-      if (hasTied([...copyPlayers.p1.slots, ...copyPlayers.p2.slots])) {
-        setTieGame();
-        incrementTieScoreByOne();
-        return;
-      }
-
-      setPlayers(copyPlayers);
-      setCurrentPlayer("p2");
-
-      await delay(0.5);
-
-      const copyPlayersCPU = { ...copyPlayers };
-      const cpuMove = getBestMove(players.p1.slots, players.p2.slots, "p2");
-      copyPlayersCPU.p2.slots.push(cpuMove);
-
-      if (hasPlayerWon(players.p2.slots)) {
-        setWinner("p2");
-        updateScore("p2");
-        return;
-      }
-
-      const allSlots = [...copyPlayers.p1.slots, ...copyPlayersCPU.p2.slots];
-      if (hasTied(allSlots)) {
-        setTieGame();
-        incrementTieScoreByOne();
-        return;
-      }
-
-      setCurrentPlayer("p1");
-      setPlayers(copyPlayersCPU);
+    if (hasPlayerWon(players[currentPlayer].slots)) {
+      setWinner(currentPlayer);
+      updateScore(currentPlayer);
+      return;
     }
-  }
+
+    if (hasTied([...players.p1.slots, ...players.p2.slots])) {
+      setTieGame();
+      incrementTieScoreByOne();
+      return;
+    }
+
+    toggleCurrentPlayer();
+  };
+
+  const handleCPUGame = async (slot: number) => {
+    appendToPlayerSlots("p1", slot);
+
+    if (hasPlayerWon(players.p1.slots)) {
+      setWinner("p1");
+      updateScore("p1");
+      return;
+    }
+
+    if (hasTied([...players.p1.slots, ...players.p2.slots])) {
+      setTieGame();
+      incrementTieScoreByOne();
+      return;
+    }
+
+    setCurrentPlayer("p2");
+
+    setIsSCPUPlaying(true);
+    await delay(0.5);
+
+    const cpuMove = getBestMove(players.p1.slots, players.p2.slots, "p2");
+    appendToPlayerSlots("p2", cpuMove);
+
+    if (hasPlayerWon(players.p2.slots)) {
+      setWinner("p2");
+      updateScore("p2");
+      return;
+    }
+
+    const allSlots = [...players.p1.slots, ...players.p2.slots];
+    if (hasTied(allSlots)) {
+      setTieGame();
+      incrementTieScoreByOne();
+      return;
+    }
+
+    setIsSCPUPlaying(false);
+    setCurrentPlayer("p1");
+  };
 
   useEffect(() => {
     if (
@@ -127,12 +126,12 @@ export default function StartGame() {
       players.p2.mark === EMark.CROSS &&
       players.p2.slots.length === 0
     ) {
+      setIsSCPUPlaying(true);
       delay(0.5).then(() => {
-        const copyPlayersCPU = { ...players };
         const cpuMove = getBestMove(players.p1.slots, players.p2.slots, "p2");
-        copyPlayersCPU.p2.slots.push(cpuMove);
-        toggleCurrentPlayer();
-        setPlayers(copyPlayersCPU);
+        appendToPlayerSlots("p2", cpuMove);
+        setCurrentPlayer("p1");
+        setIsSCPUPlaying(false);
       });
     }
     /* eslint-disable react-hooks/exhaustive-deps */
@@ -166,7 +165,14 @@ export default function StartGame() {
             return (
               <SlotButton
                 key={slot}
-                onClick={() => handleOnSlotClick(slot)}
+                disabled={isCPUPlaying}
+                onClick={async () => {
+                  if (gameType === EGameType.PVP) {
+                    handlePVPGame(slot);
+                  } else if (gameType === EGameType.CPU) {
+                    await handleCPUGame(slot);
+                  }
+                }}
                 slot={slot}
               />
             );

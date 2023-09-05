@@ -6,6 +6,7 @@ import {
   SetStateAction,
   useState,
 } from "react";
+import { IPlayerId } from "@/app/startgame/useCurrentPlayer";
 
 export enum EMark {
   CROSS = "X",
@@ -28,6 +29,7 @@ export const PlayersContext = createContext<{
   resetPlayers: () => void;
   resetPlayersSlots: () => void;
   updatePlayersMarks: (p1Mark: EMark, p2Mark: EMark) => void;
+  appendToPlayerSlots: (currentPlayer: IPlayerId, slot: number) => void;
 }>({
   players: {
     p1: { mark: EMark.CROSS, slots: [] },
@@ -37,6 +39,7 @@ export const PlayersContext = createContext<{
   resetPlayers: () => {},
   resetPlayersSlots: () => {},
   updatePlayersMarks: () => {},
+  appendToPlayerSlots: () => {},
 });
 
 export default function PlayersProvider({ children }: { children: ReactNode }) {
@@ -66,6 +69,13 @@ export default function PlayersProvider({ children }: { children: ReactNode }) {
     setPlayers(copyPlayerObj);
   };
 
+  const appendToPlayerSlots = (currentPlayer: IPlayerId, slot: number) => {
+    const copyPlayers = { ...players };
+    copyPlayers[currentPlayer].slots.push(slot);
+
+    setPlayers(copyPlayers);
+  };
+
   return (
     <PlayersContext.Provider
       value={{
@@ -74,6 +84,7 @@ export default function PlayersProvider({ children }: { children: ReactNode }) {
         resetPlayers,
         resetPlayersSlots,
         updatePlayersMarks,
+        appendToPlayerSlots,
       }}
     >
       {children}

@@ -14,15 +14,22 @@ function MarkIcon({ mark }: { mark: EMark }) {
 interface ISlotButtonProps {
   onClick: () => void;
   slot: number;
+  disabled: boolean;
 }
 
-export default function SlotButton({ onClick, slot }: ISlotButtonProps) {
+export default function SlotButton({
+  onClick,
+  slot,
+  disabled,
+}: ISlotButtonProps) {
   const { players } = useContext(PlayersContext);
 
   return (
     <button
       onClick={onClick}
-      disabled={[...players.p1.slots, ...players.p2.slots].includes(slot)}
+      disabled={
+        [...players.p1.slots, ...players.p2.slots].includes(slot) || disabled
+      }
       className="w-full h-28 bg-light-green rounded-xl cursor-pointer active:translate-y-2 active:[box-shadow:0_0px_0_0_#0d151a] active:border-b-[0px] transition-all duration-150 [box-shadow:0_10px_0_0_#0d151a] border-b-[1px] border-y-light-green"
     >
       {players.p1.slots.includes(slot) && (
