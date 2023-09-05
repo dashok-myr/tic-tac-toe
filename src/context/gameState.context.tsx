@@ -1,5 +1,5 @@
 "use client";
-import {
+import React, {
   createContext,
   Dispatch,
   ReactNode,
@@ -18,12 +18,18 @@ export enum EGameState {
   RESTART,
 }
 
+export type IPlayerId = "p1" | "p2";
+
 export const GameStateContext = createContext<{
   gameState: EGameState;
   setGameState: Dispatch<SetStateAction<EGameState>>;
+  setWinner: (currentPlayer: IPlayerId) => void;
+  setTieGame: () => void;
 }>({
   gameState: EGameState.CHOOSE_GAME_TYPE,
   setGameState: () => {},
+  setWinner: () => {},
+  setTieGame: () => {},
 });
 
 export const GameStateProvider = ({ children }: { children: ReactNode }) => {
@@ -31,8 +37,22 @@ export const GameStateProvider = ({ children }: { children: ReactNode }) => {
     EGameState.CHOOSE_GAME_TYPE
   );
 
+  const setWinner = (currentPlayer: IPlayerId) => {
+    setGameState(
+      currentPlayer === "p1"
+        ? EGameState.FIRST_PLAYER_WIN
+        : EGameState.SECOND_PLAYER_WIN
+    );
+  };
+
+  const setTieGame = () => {
+    setGameState(EGameState.TIED);
+  };
+
   return (
-    <GameStateContext.Provider value={{ gameState, setGameState }}>
+    <GameStateContext.Provider
+      value={{ gameState, setGameState, setWinner, setTieGame }}
+    >
       {children}
     </GameStateContext.Provider>
   );

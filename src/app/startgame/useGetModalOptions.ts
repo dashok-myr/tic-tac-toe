@@ -1,12 +1,12 @@
 import { EGameState, GameStateContext } from "@/context/gameState.context";
-import React, { useContext } from "react";
-import { EMark, PlayersContext } from "@/context/playersContext";
+import { useContext } from "react";
+import { PlayersContext } from "@/context/playersContext";
 
 export default function useGetModalOptions(
   state: EGameState,
-  setCurrentPlayer: React.Dispatch<React.SetStateAction<"p1" | "p2">>
+  resetCurrentPlayer: () => void
 ) {
-  const { players, setPlayers } = useContext(PlayersContext);
+  const { resetPlayers, resetPlayersSlots } = useContext(PlayersContext);
   const { setGameState } = useContext(GameStateContext);
 
   switch (state) {
@@ -18,18 +18,12 @@ export default function useGetModalOptions(
         navigateQuitButton: "/",
         onFirstBtnClick: () => {
           setGameState(EGameState.CHOOSE_GAME_TYPE);
-          setPlayers({
-            p1: { mark: EMark.CROSS, slots: [] },
-            p2: { mark: EMark.NOUGHT, slots: [] },
-          });
+          resetPlayers();
         },
         onSecondBtnClick: () => {
-          setPlayers({
-            p1: { ...players.p1, slots: [] },
-            p2: { ...players.p2, slots: [] },
-          });
+          resetPlayersSlots();
           setGameState(EGameState.PLAYING);
-          setCurrentPlayer(players.p1.mark === EMark.CROSS ? "p1" : "p2");
+          resetCurrentPlayer();
         },
       };
     case EGameState.FIRST_PLAYER_WIN:
@@ -40,18 +34,12 @@ export default function useGetModalOptions(
         navigateQuitButton: "/",
         onFirstBtnClick: () => {
           setGameState(EGameState.CHOOSE_GAME_TYPE);
-          setPlayers({
-            p1: { mark: EMark.CROSS, slots: [] },
-            p2: { mark: EMark.NOUGHT, slots: [] },
-          });
+          resetPlayers();
         },
         onSecondBtnClick: () => {
-          setPlayers({
-            p1: { ...players.p1, slots: [] },
-            p2: { ...players.p2, slots: [] },
-          });
+          resetPlayersSlots();
           setGameState(EGameState.PLAYING);
-          setCurrentPlayer(players.p1.mark === EMark.CROSS ? "p1" : "p2");
+          resetCurrentPlayer();
         },
       };
     case EGameState.SECOND_PLAYER_WIN:
@@ -62,18 +50,12 @@ export default function useGetModalOptions(
         navigateQuitButton: "/",
         onFirstBtnClick: () => {
           setGameState(EGameState.CHOOSE_GAME_TYPE);
-          setPlayers({
-            p1: { mark: EMark.CROSS, slots: [] },
-            p2: { mark: EMark.NOUGHT, slots: [] },
-          });
+          resetPlayers();
         },
         onSecondBtnClick: () => {
-          setPlayers({
-            p1: { ...players.p1, slots: [] },
-            p2: { ...players.p2, slots: [] },
-          });
+          resetPlayersSlots();
           setGameState(EGameState.PLAYING);
-          setCurrentPlayer(players.p1.mark === EMark.CROSS ? "p1" : "p2");
+          resetCurrentPlayer();
         },
       };
     case EGameState.TIED:
@@ -84,18 +66,12 @@ export default function useGetModalOptions(
         navigateQuitButton: "/",
         onFirstBtnClick: () => {
           setGameState(EGameState.CHOOSE_GAME_TYPE);
-          setPlayers({
-            p1: { mark: EMark.CROSS, slots: [] },
-            p2: { mark: EMark.NOUGHT, slots: [] },
-          });
+          resetPlayers();
         },
         onSecondBtnClick: () => {
-          setPlayers({
-            p1: { ...players.p1, slots: [] },
-            p2: { ...players.p2, slots: [] },
-          });
+          resetPlayersSlots();
           setGameState(EGameState.PLAYING);
-          setCurrentPlayer(players.p1.mark === EMark.CROSS ? "p1" : "p2");
+          resetCurrentPlayer();
         },
       };
     case EGameState.LOST:
@@ -106,18 +82,12 @@ export default function useGetModalOptions(
         navigateQuitButton: "/",
         onFirstBtnClick: () => {
           setGameState(EGameState.CHOOSE_GAME_TYPE);
-          setPlayers({
-            p1: { mark: EMark.CROSS, slots: [] },
-            p2: { mark: EMark.NOUGHT, slots: [] },
-          });
+          resetPlayers();
         },
         onSecondBtnClick: () => {
-          setPlayers({
-            p1: { ...players.p1, slots: [] },
-            p2: { ...players.p2, slots: [] },
-          });
+          resetPlayersSlots();
           setGameState(EGameState.PLAYING);
-          setCurrentPlayer(players.p1.mark === EMark.CROSS ? "p1" : "p2");
+          resetCurrentPlayer();
         },
       };
     case EGameState.RESTART:
@@ -130,12 +100,9 @@ export default function useGetModalOptions(
           setGameState(EGameState.PLAYING);
         },
         onSecondBtnClick: () => {
-          setPlayers({
-            p1: { ...players.p1, slots: [] },
-            p2: { ...players.p2, slots: [] },
-          });
+          resetPlayersSlots();
           setGameState(EGameState.PLAYING);
-          setCurrentPlayer(players.p1.mark === EMark.CROSS ? "p1" : "p2");
+          resetCurrentPlayer();
         },
       };
     default:

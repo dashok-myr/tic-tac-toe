@@ -7,7 +7,7 @@ import { EMark, PlayersContext } from "@/context/playersContext";
 import classnames from "classnames";
 
 export default function ChooseMarkSwitch() {
-  const { players, setPlayers } = useContext(PlayersContext);
+  const { players, updatePlayersMarks } = useContext(PlayersContext);
   const [currentMark, setCurrentMark] = useState<EMark>(EMark.CROSS);
 
   return (
@@ -20,10 +20,7 @@ export default function ChooseMarkSwitch() {
           <button
             onClick={() => {
               setCurrentMark(EMark.CROSS);
-              const copyPlayerObj = { ...players };
-              copyPlayerObj.p1.mark = EMark.CROSS;
-              copyPlayerObj.p2.mark = EMark.NOUGHT;
-              setPlayers(copyPlayerObj);
+              updatePlayersMarks(EMark.CROSS, EMark.NOUGHT);
             }}
             className={classnames("flex-1", {
               "p-3 bg-silver rounded-xl": currentMark === EMark.CROSS,
@@ -36,10 +33,7 @@ export default function ChooseMarkSwitch() {
           <button
             onClick={() => {
               setCurrentMark(EMark.NOUGHT);
-              const copyPlayerObj = { ...players };
-              copyPlayerObj.p1.mark = EMark.NOUGHT;
-              copyPlayerObj.p2.mark = EMark.CROSS;
-              setPlayers(copyPlayerObj);
+              updatePlayersMarks(EMark.NOUGHT, EMark.CROSS);
             }}
             className={classnames("flex-1", {
               "p-3 bg-silver rounded-xl": currentMark === EMark.NOUGHT,
